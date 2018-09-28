@@ -9,39 +9,41 @@
       </v-layout>
 
       <v-layout row wrap>
-        <v-divider horizontal></v-divider>
-        <v-data-table
-          v-model="selected"
-          :headers="headers"
-          :items="employees"
-          item-key="id"
-          :hide-actions="false"
-          select-all
-          class="elevation-1"
-          prev-icon="mdi-menu-left"
-          next-icon="mdi-menu-right"
-          sort-icon="mdi-menu-down">
-          <template slot="items" slot-scope="props">
-            <tr v-show="props.item.active || display_active" :class="props.item.active ? '' : 'disabled'">
-              <td>
-                <v-checkbox
-                v-model="props.selected"
-                primary
-                hide-details
-                ></v-checkbox>
-              </td>
-              <td>{{props.item.nom}}</td>
-              <td>{{props.item.prenom}}</td>
-              <td>{{props.item.id}}</td>
-              <td><v-icon class="mr-2" @click="editItem(props.item)">mdi-account-edit</v-icon></td>
-            </tr>
-          </template>
-          <template slot="no-data">
-            <v-alert :value="true" color="error" icon="warning">
-              Sorry, nothing to display here :(
-            </v-alert>
-          </template>
-        </v-data-table>
+        <v-flex xs12>
+          <v-divider horizontal></v-divider>
+          <v-data-table
+            v-model="selected"
+            :headers="headers"
+            :items="employees"
+            item-key="id"
+            :hide-actions="false"
+            select-all
+            class="elevation-1"
+            prev-icon="mdi-menu-left"
+            next-icon="mdi-menu-right"
+            sort-icon="mdi-menu-down">
+            <template slot="items" slot-scope="props">
+              <tr v-show="props.item.active || display_active" :class="props.item.active ? '' : 'disabled'">
+                <td>
+                  <v-checkbox
+                  v-model="props.selected"
+                  primary
+                  hide-details
+                  ></v-checkbox>
+                </td>
+                <td>{{props.item.nom}}</td>
+                <td>{{props.item.prenom}}</td>
+                <td>{{props.item.id}}</td>
+                <td><v-icon class="mr-2" @click="editItem(props.item)">mdi-account-edit</v-icon></td>
+              </tr>
+            </template>
+            <template slot="no-data">
+              <v-alert :value="true" color="error" icon="warning">
+                Sorry, nothing to display here :(
+              </v-alert>
+            </template>
+          </v-data-table>
+        </v-flex>
       </v-layout>
 
       <v-layout row wrap>
@@ -100,6 +102,7 @@ export default {
           sortable: false
         },
       ],
+      employees: [],
       selected: []
     }
   },
@@ -114,6 +117,9 @@ export default {
     }
   },
   methods: {
+    initialize () {
+      this.employees = [{id: 10958, nom: 'Pittet', prenom: 'Maurice', active: true}, {id: 7, nom: 'Naegele', prenom: 'Christian', active: false}, {id: 6, nom: 'Gil', prenom: 'Carlos', active: true}]
+    },
     click () {
       // TODO: Afficher le widget et evt. faire quelques initialisations
     },
@@ -126,9 +132,29 @@ export default {
     save () {
       // TODO: Emettre un événement avec en paramètre la liste des employés sélectionnés
     }
+  },
+  created () {
+    this.initialize()
   }
 }
 </script>
 
-<style lang="css">
+<style lang="css" scoped>
+h3 {
+  margin: 40px 0 0;
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+li {
+  display: inline-block;
+  margin: 0 10px;
+}
+a {
+  color: #42b983;
+}
+.disabled {
+  color: grey;
+}
 </style>
