@@ -4,7 +4,7 @@ import 'vuetify/dist/vuetify.min.css'
 import fr from 'vuetify/es5/locale/fr'
 
 Vue.use(Vuetify, {
-  iconfont: 'md',
+  iconfont: 'mdi',
   lang: {
     locales: { fr },
     current: 'fr'

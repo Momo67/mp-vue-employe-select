@@ -30,18 +30,18 @@
     >
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       <v-btn icon @click.stop="miniVariant = !miniVariant">
-        <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
+        <v-icon v-html="miniVariant ? 'mdi-chevron-right' : 'mdi-chevron-left'"></v-icon>
       </v-btn>
       <v-btn icon @click.stop="clipped = !clipped">
-        <v-icon>web</v-icon>
+        <v-icon>mdi-web</v-icon>
       </v-btn>
       <v-btn icon @click.stop="fixed = !fixed">
-        <v-icon>web</v-icon>
+        <v-icon>mdi-minus</v-icon>
       </v-btn>
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon @click.stop="rightDrawer = !rightDrawer">
-        <v-icon>menu</v-icon>
+        <v-icon>mdi-menu</v-icon>
       </v-btn>
     </v-toolbar>
     <v-content>
@@ -57,7 +57,7 @@
       <v-list>
         <v-list-tile @click="right = !right">
           <v-list-tile-action>
-            <v-icon>compare_arrows</v-icon>
+            <v-icon>mdi-arrows-left-right-bold-outline</v-icon>
           </v-list-tile-action>
           <v-list-tile-title>Switch drawer (click me)</v-list-tile-title>
         </v-list-tile>
@@ -83,7 +83,7 @@ export default {
       drawer: true,
       fixed: false,
       items: [{
-        icon: 'bubble_chart',
+        icon: 'mdi-chart-bubble',
         title: 'Inspire'
       }],
       miniVariant: false,
