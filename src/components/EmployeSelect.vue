@@ -5,6 +5,14 @@
       <v-layout row wrap>
         <v-toolbar flat color="white">
           <v-toolbar-title>Sélection d'employés</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-text-field
+            v-model="search"
+            append-icon="search"
+            label="Recherche"
+            single-line
+            hide-details
+          ></v-text-field>
         </v-toolbar>
       </v-layout>
 
@@ -16,6 +24,7 @@
             :headers="headers"
             :items="employees"
             item-key="idemploye"
+            :search="search"
             :hide-actions="false"
             select-all
             class="elevation-1"
@@ -23,7 +32,7 @@
             next-icon="mdi-menu-right"
             sort-icon="mdi-menu-down">
             <template slot="items" slot-scope="props">
-              <tr v-show="(props.item.isactive == '1') || display_active" :class="(props.item.isactive == '1') ? '' : 'disabled'">
+              <tr v-show="(props.item.isactive == '1') || display_active" :class="(props.item.isactive == '1') ? '' : 'disabled'" @click="props.expanded = !props.expanded">
                 <td>
                   <v-checkbox
                   v-model="props.selected"
@@ -33,11 +42,21 @@
                 </td>
                 <td>{{props.item.nom}}</td>
                 <td>{{props.item.prenom}}</td>
-                <td>{{props.item.orgunits.OrgUnit.filter(orgunit => orgunit.LevelOU == "0")[0].OUName}}</td>
+                <td>{{getOUPath(props.item.orgunits.OrgUnit)}}</td>
                 <td>{{props.item.idemploye}}</td>
                 <td>{{extractLoginNT(props.item.mainntlogin)}}</td>
                 <!-- <td><v-icon class="mr-2" @click="editItem(props.item)">mdi-account-edit</v-icon></td> -->
               </tr>
+            </template>
+            <template slot="expand" slot-scope="props">
+              <v-card flat>
+                <v-card-text>
+                  <span>{{props.item.politesse}}</span><br>
+                  <span>{{props.item.prenom}}&nbsp;{{props.item.nom}}</span><br>
+                  <span>Téléphone prof.: {{props.item.telprof}}</span><br>
+                  <span>Email: {{props.item.email}}</span><br>
+                </v-card-text>
+              </v-card>
             </template>
             <template slot="no-data">
               <v-alert :value="true" type="info">
@@ -82,6 +101,7 @@ export default {
     return {
       dialog: false,
       display_active: true,
+      search: '',
       headers: [
         {
           text: 'Nom',
@@ -175,6 +195,18 @@ export default {
       } else {
         return mainntlogin
       }
+    },
+    getOUPath (orgunits)
+    {
+      let __myorgunits = orgunits.slice()
+      __myorgunits.sort(function (a, b) {
+        return parseInt(b.LevelOU) - parseInt(a.LevelOU)
+      })
+      let __oupath = ''
+      __myorgunits.forEach(function (orgunit, index, array) {
+        __oupath += orgunit.OUName + ((index+1 != array.length) ? ' / ' : '')
+      })
+      return __oupath
     }
   },
   created () {
