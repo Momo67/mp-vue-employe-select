@@ -26,18 +26,20 @@
             item-key="idemploye"
             :search="search"
             :hide-actions="false"
-            select-all
+            :select-all="false"
             class="elevation-1"
             prev-icon="mdi-menu-left"
             next-icon="mdi-menu-right"
             sort-icon="mdi-menu-down">
             <template slot="items" slot-scope="props">
-              <tr v-show="(props.item.isactive == '1') || display_active" :class="(props.item.isactive == '1') ? '' : 'disabled'" @click="props.expanded = !props.expanded">
+              <tr :class="(props.item.isactive == '1') ? '' : 'disabled'" @click="props.expanded = !props.expanded">
                 <td>
-                  <v-checkbox
-                  v-model="props.selected"
-                  primary
-                  hide-details
+                  <v-checkbox v-show="(props.item.isactive == '1') || allowNonactiveSelectable"
+                    @click.native.stop
+                    v-model="props.selected"
+                    :disabled="!((props.item.isactive == '1') || allowNonactiveSelectable)"
+                    primary
+                    hide-details
                   ></v-checkbox>
                 </td>
                 <td>{{props.item.nom}}</td>
@@ -69,10 +71,10 @@
 
       <v-layout row wrap>
         <v-switch
-        :label="'Afficher les employés désactivé: ' + (display_active.toString() == 'true' ? 'oui' : 'non')"
-        v-model="display_active"
-        :false-value="false"
-        :true-value="true"
+          :label="'Afficher les employés désactivé: ' + (display_nonactive.toString() == 'true' ? 'oui' : 'non')"
+          v-model="display_nonactive"
+          :false-value="false"
+          :true-value="true"
         ></v-switch>
       </v-layout>
 
@@ -95,14 +97,25 @@ export default {
       type: Boolean,
       default: true,
       require: false
+    },
+    allowNonactiveSelectable: {
+      type: Boolean,
+      default: false,
+      require: false
     }
   },
   data () {
     return {
       dialog: false,
-      display_active: true,
+      display_nonactive: true,
       search: '',
       headers: [
+        {
+          text: '',
+          value: '',
+          align: 'left',
+          sortable: false
+        },
         {
           text: 'Nom',
           value: 'nom',
@@ -145,11 +158,19 @@ export default {
         console.log('### employé sélectionné: ', val)
       }
     },
+    display_nonactive: {
+      handler (val) {
+        this.fetchData()
+      }
+    },
     dialog (val) {
       val || this.close()
     }
   },
   methods: {
+    dummy_func (msg) {
+      console.log(msg)
+    },
     initialize () {
       // this.employees = [{id: 10958, nom: 'Pittet', prenom: 'Maurice', active: true}, {id: 7, nom: 'Naegele', prenom: 'Christian', active: false}, {id: 6, nom: 'Gil', prenom: 'Carlos', active: true}, {id: 1, nom: 'Test1', prenom: 'Maurice', active: true}, {id: 2, nom: 'Test2', prenom: 'Christian', active: false}, {id: 3, nom: 'Test3', prenom: 'Carlos', active: true}]
     },
@@ -167,7 +188,9 @@ export default {
     },
     fetchData () {
       this.$axios.post(this.fetch_url, {params: {idou: 62, prenom: '*', nom: '*'}}).then(response => {
-        this.employees = response.data.Employe
+      // this.$axios.post(this.fetch_url, {params: {loginnt: 10958}}).then(response => {
+        let __display_nonactive = this.display_nonactive
+        this.employees = response.data.Employe.filter(employe => (employe.IsActive === '1') || __display_nonactive)
 
         this.employees.forEach(function(employee) {
 	        for (var prop in employee) {
@@ -180,13 +203,13 @@ export default {
         console.log('### emoployees: ', this.employees)
       }).catch(error => {
         if (error.response) {
-          console.log('Error data: ', error.response.data, ' status: ', error.response.status, ' headers: ', error.response.headers)
+          console.error('Error data: ', error.response.data, ' status: ', error.response.status, ' headers: ', error.response.headers)
         } else if (error.request) {
-          console.log('Error request: ', error.request)
+          console.error('Error request: ', error.request)
         } else {
-          console.log('Error', error.message)
+          console.error('Error', error.message)
         }
-        console.log(error.config)
+        console.error(error.config)
       })
     },
     extractLoginNT (mainntlogin) {
