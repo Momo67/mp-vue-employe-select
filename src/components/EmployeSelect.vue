@@ -1,86 +1,145 @@
 <template lang="html">
   <v-app>
-    <v-container fluid>
 
+    <v-container fluid>
       <v-layout row wrap>
         <v-toolbar flat color="white">
           <v-toolbar-title>Sélection d'employés</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-text-field
-            v-model="search"
-            append-icon="search"
-            label="Recherche"
-            single-line
-            hide-details
-          ></v-text-field>
         </v-toolbar>
       </v-layout>
 
       <v-layout row wrap>
         <v-flex xs12>
           <v-divider horizontal></v-divider>
-          <v-data-table
-            v-model="selected"
-            :headers="headers"
-            :items="employees"
-            item-key="idemploye"
-            :search="search"
-            :hide-actions="false"
-            :select-all="false"
-            class="elevation-1"
-            prev-icon="mdi-menu-left"
-            next-icon="mdi-menu-right"
-            sort-icon="mdi-menu-down">
-            <template slot="items" slot-scope="props">
-              <tr :class="(props.item.isactive == '1') ? '' : 'disabled'" @click="props.expanded = !props.expanded">
-                <td>
-                  <v-checkbox v-show="(props.item.isactive == '1') || allowNonactiveSelectable"
+          <v-card>
+            <v-card-title></v-card-title>
+            <v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs4>
+                    <v-text-field v-model="employee.idou" label="Unité organisationnelle"></v-text-field>
+                  </v-flex>
+                  <v-flex xs4>
+                    <v-text-field v-model="employee.nom" label="Nom"></v-text-field>
+                  </v-flex>
+                  <v-flex xs4>
+                    <v-text-field v-model="employee.prenom" label="Prénom"></v-text-field>
+                  </v-flex>
+                  <v-flex xs4>
+                    <v-text-field v-model="employee.loginnt" label="Login NT"></v-text-field>
+                  </v-flex>
+                  <v-flex xs4>
+                    <v-text-field v-model="employee.id" label="Id"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12>
+                    <v-switch
+                      :label="'Afficher les employés désactivé: ' + (display_nonactive.toString() == 'true' ? 'oui' : 'non')"
+                      v-model="display_nonactive"
+                      :false-value="false"
+                      :true-value="true"
+                    ></v-switch>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+              <v-layout wrap>
+                <v-flex xs12>
+                  <v-alert
+                    v-model="alert"
+                    dismissible
+                    type="warning"
+                    icon="error"
+                  >
+                    {{alert_msg}}
+                  </v-alert>
+
+                </v-flex>
+              </v-layout>
+            </v-card-text>
+            <v-card-actions>
+              <v-layout wrap>
+                <v-flex xs2 offset-xs10>
+                  <v-btn color="blue darken-1" flat @click.native="fetchData">Rechercher</v-btn>
+                </v-flex>
+              </v-layout>
+            </v-card-actions>
+          </v-card>
+        </v-flex>
+      </v-layout>
+
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-divider horizontal></v-divider>
+          <v-card>
+            <v-card-title>
+              <v-spacer></v-spacer>
+              <v-layout wrap>
+                <v-flex xs4 offset-xs8>
+                  <v-text-field
+                    v-model="search"
+                    append-icon="search"
+                    label="Recherche..."
+                    single-line
+                    hide-details
+                  ></v-text-field>
+                </v-flex>
+              </v-layout>
+            </v-card-title>
+            <v-data-table
+              v-model="selected"
+              :headers="headers"
+              :items="employees"
+              item-key="idemploye"
+              :search="search"
+              :hide-actions="false"
+              :select-all="false"
+              class="elevation-1"
+              prev-icon="mdi-menu-left"
+              next-icon="mdi-menu-right"
+              sort-icon="mdi-menu-down">
+              <template slot="items" slot-scope="props">
+                <tr :class="(props.item.isactive == '1') ? '' : 'disabled'" @click="props.expanded = !props.expanded">
+                  <td>
+                    <v-checkbox v-show="(props.item.isactive == '1') || allowNonactiveSelectable"
                     @click.native.stop
                     v-model="props.selected"
                     :disabled="!((props.item.isactive == '1') || allowNonactiveSelectable)"
                     primary
                     hide-details
-                  ></v-checkbox>
-                </td>
-                <td>{{props.item.nom}}</td>
-                <td>{{props.item.prenom}}</td>
-                <td>{{getOUPath(props.item.orgunits.OrgUnit)}}</td>
-                <td>{{props.item.idemploye}}</td>
-                <td>{{extractLoginNT(props.item.mainntlogin)}}</td>
-                <!-- <td><v-icon class="mr-2" @click="editItem(props.item)">mdi-account-edit</v-icon></td> -->
-              </tr>
-            </template>
-            <template slot="expand" slot-scope="props">
-              <v-card flat>
-                <v-card-text>
-                  <span>{{props.item.politesse}}</span><br>
-                  <span>{{props.item.prenom}}&nbsp;{{props.item.nom}}</span><br>
-                  <span>Téléphone prof.: {{props.item.telprof}}</span><br>
-                  <span>Email: {{props.item.email}}</span><br>
-                </v-card-text>
-              </v-card>
-            </template>
-            <template slot="no-data">
-              <v-alert :value="true" type="info">
-                Désolé, il n'y a aucun employé correspondant à votre recherche!
-              </v-alert>
-            </template>
-          </v-data-table>
+                    ></v-checkbox>
+                  </td>
+                  <td>{{props.item.nom}}</td>
+                  <td>{{props.item.prenom}}</td>
+                  <td>{{getOUPath(props.item.orgunits.OrgUnit)}}</td>
+                  <td>{{props.item.idemploye}}</td>
+                  <td>{{extractLoginNT(props.item.mainntlogin)}}</td>
+                  <!-- <td><v-icon class="mr-2" @click="editItem(props.item)">mdi-account-edit</v-icon></td> -->
+                </tr>
+              </template>
+              <template slot="expand" slot-scope="props">
+                <v-card flat>
+                  <v-card-text>
+                    <span>{{props.item.politesse}}</span><br>
+                    <span>{{props.item.prenom}}&nbsp;{{props.item.nom}}</span><br>
+                    <span>Téléphone prof.: {{props.item.telprof}}</span><br>
+                    <span>Email: {{props.item.email}}</span><br>
+                  </v-card-text>
+                </v-card>
+              </template>
+              <template slot="no-data">
+                <v-alert :value="true" type="info">
+                  Désolé, il n'y a aucun employé correspondant à votre recherche!
+                </v-alert>
+              </template>
+            </v-data-table>
+          </v-card>
         </v-flex>
       </v-layout>
 
       <v-layout row wrap>
-        <v-switch
-          :label="'Afficher les employés désactivé: ' + (display_nonactive.toString() == 'true' ? 'oui' : 'non')"
-          v-model="display_nonactive"
-          :false-value="false"
-          :true-value="true"
-        ></v-switch>
-      </v-layout>
-
-      <v-layout row wrap justify-end>
-        <v-btn color="blue darken-1" flat @click.native="cancel">Annuler</v-btn>
-        <v-btn color="blue darken-1" flat @click.native="save">OK</v-btn>
+        <v-flex xs2 offset-xs10>
+          <v-btn color="blue darken-1" flat @click.native="cancel">Annuler</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="save">OK</v-btn>
+        </v-flex>
       </v-layout>
     </v-container>
   </v-app>
@@ -90,6 +149,7 @@
 import '../plugins/axios'
 
 import {EMP_URL_AJAX} from '../config'
+import {EMPLOYEE_INIT} from '../config'
 
 export default {
   props: {
@@ -107,6 +167,8 @@ export default {
   data () {
     return {
       dialog: false,
+      alert: false,
+      alert_msg: '',
       display_nonactive: true,
       search: '',
       headers: [
@@ -147,6 +209,13 @@ export default {
           sortable: true
         },
       ],
+      employee: {
+        nom: null,
+        prenom: null,
+        loginnt: null,
+        id: null,
+        idou: null
+      },
       employees: [],
       selected: [],
       fetch_url: `${EMP_URL_AJAX}/employe_get_liste.php`
@@ -159,7 +228,7 @@ export default {
       }
     },
     display_nonactive: {
-      handler (val) {
+      handler () {
         this.fetchData()
       }
     },
@@ -172,7 +241,7 @@ export default {
       console.log(msg)
     },
     initialize () {
-      // this.employees = [{id: 10958, nom: 'Pittet', prenom: 'Maurice', active: true}, {id: 7, nom: 'Naegele', prenom: 'Christian', active: false}, {id: 6, nom: 'Gil', prenom: 'Carlos', active: true}, {id: 1, nom: 'Test1', prenom: 'Maurice', active: true}, {id: 2, nom: 'Test2', prenom: 'Christian', active: false}, {id: 3, nom: 'Test3', prenom: 'Carlos', active: true}]
+      this.employee = Object.assign({}, EMPLOYEE_INIT)
     },
     click () {
       // TODO: Afficher le widget et evt. faire quelques initialisations
@@ -187,20 +256,41 @@ export default {
       // TODO: Emettre un événement avec en paramètre la liste des employés sélectionnés
     },
     fetchData () {
-      this.$axios.post(this.fetch_url, {params: {idou: 62, prenom: '*', nom: '*'}}).then(response => {
-      // this.$axios.post(this.fetch_url, {params: {loginnt: 10958}}).then(response => {
+      if (this.isEqual(this.employee, EMPLOYEE_INIT)) {
+        this.alert_msg = 'Vous devez entrer au moins un critère!'
+        this.alert = true
+        return
+      }
+
+      if (this.employee.idou == null) {
+        this.employee.idou = 0
+      }
+
+      if ((this.employee.nom === null) || (this.employee.nom == '')) {
+        this.employee.nom = '*'
+      } else if (this.employee.nom.slice(-1) != '*') {
+        this.employee.nom += '*'
+      }
+
+      if ((this.employee.prenom === null) || (this.employee.prenom == '')) {
+        this.employee.prenom = '*'
+      } else if (this.employee.prenom.slice(-1) != '*') {
+        this.employee.prenom += '*'
+      }
+
+      this.$axios.post(this.fetch_url, {params: this.employee}).then(response => {
         let __display_nonactive = this.display_nonactive
         this.employees = response.data.Employe.filter(employe => (employe.IsActive === '1') || __display_nonactive)
 
         this.employees.forEach(function(employee) {
-	        for (var prop in employee) {
-		        employee[prop.toLowerCase()] = employee[prop]
-		        delete employee[prop]
-	        }
+          for (var prop in employee) {
+            employee[prop.toLowerCase()] = employee[prop]
+            delete employee[prop]
+          }
         })
 
         console.log('### response: ', response)
-        console.log('### emoployees: ', this.employees)
+        console.log('### employees: ', this.employees)
       }).catch(error => {
         if (error.response) {
           console.error('Error data: ', error.response.data, ' status: ', error.response.status, ' headers: ', error.response.headers)
@@ -221,20 +311,36 @@ export default {
     },
     getOUPath (orgunits)
     {
-      let __myorgunits = orgunits.slice()
-      __myorgunits.sort(function (a, b) {
-        return parseInt(b.LevelOU) - parseInt(a.LevelOU)
+      if (orgunits !== undefined) {
+        if (Array.isArray(orgunits)) {
+          let __myorgunits = orgunits.slice()
+          __myorgunits.sort(function (a, b) {
+            return parseInt(b.LevelOU) - parseInt(a.LevelOU)
+          })
+          let __oupath = ''
+          __myorgunits.forEach(function (orgunit, index, array) {
+            __oupath += orgunit.OUName + ((index+1 != array.length) ? ' / ' : '')
+          })
+          return __oupath
+        } else {
+          return orgunits.OUName
+        }
+      } else {
+        return ''
+      }
+    },
+    isEqual (obj1, obj2) {
+      let __isequal = true
+      Object.keys(obj1).forEach(function (key) {
+        if (obj2[key] !== obj1[key]) {
+          return __isequal = false
+        }
       })
-      let __oupath = ''
-      __myorgunits.forEach(function (orgunit, index, array) {
-        __oupath += orgunit.OUName + ((index+1 != array.length) ? ' / ' : '')
-      })
-      return __oupath
+      return __isequal
     }
   },
   created () {
     this.initialize()
-    this.fetchData()
   }
 }
 </script>
