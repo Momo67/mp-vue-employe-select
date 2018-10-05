@@ -17,7 +17,15 @@
               <v-container grid-list-md>
                 <v-layout wrap>
                   <v-flex xs4>
-                    <v-text-field v-model="employee.idou" label="Unité organisationnelle"></v-text-field>
+                    <!-- <v-text-field v-model="employee.idou" label="Unité organisationnelle"></v-text-field> -->
+                    <v-select
+                      v-model="employee.idou"
+                      :items="orgunits"
+                      item-text="Description"
+                      item-value="IdOrgUnit"
+                      label="Unité organisationnelle"
+                      search-input
+                    ></v-select>
                   </v-flex>
                   <v-flex xs4>
                     <v-text-field v-model="employee.nom" label="Nom"></v-text-field>
@@ -51,7 +59,6 @@
                   >
                     {{alert_msg}}
                   </v-alert>
-
                 </v-flex>
               </v-layout>
             </v-card-text>
@@ -146,10 +153,12 @@
 </template>
 
 <script>
-import '../plugins/axios'
+//import '../plugins/axios'
 
-import {EMP_URL_AJAX} from '../config'
-import {EMPLOYEE_INIT} from '../config'
+import { EMPLOYEE_INIT } from '../config'
+import { ORGUNIT_INIT } from '../config'
+import { employe as EMPLOYE } from './employe'
+import { orgunit as ORGUNIT } from './orgunit'
 
 export default {
   props: {
@@ -218,7 +227,8 @@ export default {
       },
       employees: [],
       selected: [],
-      fetch_url: `${EMP_URL_AJAX}/employe_get_liste.php`
+      orgunit: undefined,
+      orgunits: []
     }
   },
   watch: {
@@ -232,6 +242,12 @@ export default {
         this.fetchData()
       }
     },
+    'employee.idou': {
+      handler (val) {
+        console.log('### idou: ', val)
+      },
+      deep: true
+    },
     dialog (val) {
       val || this.close()
     }
@@ -242,6 +258,8 @@ export default {
     },
     initialize () {
       this.employee = Object.assign({}, EMPLOYEE_INIT)
+      this.orgunit = Object.assign({}, ORGUNIT_INIT)
+      this.getOUList()
     },
     click () {
       // TODO: Afficher le widget et evt. faire quelques initialisations
@@ -260,47 +278,11 @@ export default {
         this.alert_msg = 'Vous devez entrer au moins un critère!'
         this.alert = true
         return
-      }
-
-      if (this.employee.idou == null) {
-        this.employee.idou = 0
-      }
-
-      if ((this.employee.nom === null) || (this.employee.nom == '')) {
-        this.employee.nom = '*'
-      } else if (this.employee.nom.slice(-1) != '*') {
-        this.employee.nom += '*'
-      }
-
-      if ((this.employee.prenom === null) || (this.employee.prenom == '')) {
-        this.employee.prenom = '*'
-      } else if (this.employee.prenom.slice(-1) != '*') {
-        this.employee.prenom += '*'
-      }
-
-      this.$axios.post(this.fetch_url, {params: this.employee}).then(response => {
-        let __display_nonactive = this.display_nonactive
-        this.employees = response.data.Employe.filter(employe => (employe.IsActive === '1') || __display_nonactive)
-
-        this.employees.forEach(function(employee) {
-          for (var prop in employee) {
-            employee[prop.toLowerCase()] = employee[prop]
-            delete employee[prop]
-          }
+      } else {
+        EMPLOYE.getList (this.employee, this.display_nonactive, (data) => {
+          this.employees = data
         })
-
-        console.log('### response: ', response)
-        console.log('### employees: ', this.employees)
-      }).catch(error => {
-        if (error.response) {
-          console.error('Error data: ', error.response.data, ' status: ', error.response.status, ' headers: ', error.response.headers)
-        } else if (error.request) {
-          console.error('Error request: ', error.request)
-        } else {
-          console.error('Error', error.message)
-        }
-        console.error(error.config)
-      })
+      }
     },
     extractLoginNT (mainntlogin) {
       if (/^LAUSANNE_CH/.test(mainntlogin)) {
@@ -328,6 +310,11 @@ export default {
       } else {
         return ''
       }
+    },
+    getOUList() {
+      ORGUNIT.getList (this.orgunit, (data) => {
+        this.orgunits = data
+      })
     },
     isEqual (obj1, obj2) {
       let __isequal = true
