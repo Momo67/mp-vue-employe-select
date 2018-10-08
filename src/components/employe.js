@@ -41,6 +41,8 @@ class Employe {
       __data.forEach(function(employee) {
         for (var prop in employee) {
           employee[prop.toLowerCase()] = employee[prop]
+          if (typeof employee['prenom'] === 'object')
+            employee['prenom'] = ''
           delete employee[prop]
         }
       })
