@@ -1,5 +1,5 @@
 <template lang="html">
-  <v-app>
+  <v-app v-show="show" v-on:click="display_component">
 
     <v-container fluid>
       <v-layout row wrap>
@@ -17,27 +17,37 @@
               <v-container grid-list-md>
                 <v-layout wrap>
                   <v-flex xs4>
-                    <!-- <v-text-field v-model="employee.idou" label="Unité organisationnelle"></v-text-field> -->
-                    <v-select
+                    <!-- <v-select
                       v-model="employee.idou"
                       :items="orgunits"
                       item-text="Description"
                       item-value="IdOrgUnit"
                       label="Unité organisationnelle"
-                      search-input
-                    ></v-select>
+                    ></v-select> -->
+                    <v-autocomplete
+                      v-model="employee.idou"
+                      :items="orgunits"
+                      color="white"
+                      hide-no-data
+                      clearable
+                      item-text="Description"
+                      item-value="IdOrgUnit"
+                      label="Unité organisationnelle"
+                      placeholder="Entrer un caractère pour commencer la recherche"
+                    ></v-autocomplete>
+
                   </v-flex>
                   <v-flex xs4>
-                    <v-text-field v-model="employee.nom" label="Nom"></v-text-field>
+                    <v-text-field v-model="employee.nom" label="Nom" clearable></v-text-field>
                   </v-flex>
                   <v-flex xs4>
-                    <v-text-field v-model="employee.prenom" label="Prénom"></v-text-field>
+                    <v-text-field v-model="employee.prenom" label="Prénom" clearable></v-text-field>
                   </v-flex>
                   <v-flex xs4>
-                    <v-text-field v-model="employee.loginnt" label="Login NT"></v-text-field>
+                    <v-text-field v-model="employee.loginnt" label="Login NT" clearable></v-text-field>
                   </v-flex>
                   <v-flex xs4>
-                    <v-text-field v-model="employee.id" label="Id"></v-text-field>
+                    <v-text-field v-model="employee.id" label="Id" clearable></v-text-field>
                   </v-flex>
                   <v-flex xs12>
                     <v-switch
@@ -63,17 +73,24 @@
               </v-layout>
             </v-card-text>
             <v-card-actions>
-              <v-layout wrap>
-                <v-flex xs2 offset-xs10>
+              <v-flex xs1 offset-xs10 block>
+                <v-layout justify-start>
                   <v-btn color="blue darken-1" flat @click.native="fetchData">Rechercher</v-btn>
-                </v-flex>
-              </v-layout>
+                </v-layout>
+              </v-flex>
+              <v-flex xs1>
+                <v-layout justify-end>
+                  <v-btn icon @click="show_list = !show_list">
+                    <v-icon>{{ show_list ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+                  </v-btn>
+                </v-layout>
+              </v-flex>
             </v-card-actions>
           </v-card>
         </v-flex>
       </v-layout>
 
-      <v-layout row wrap>
+      <v-layout row wrap v-show="show_list">
         <v-flex xs12>
           <v-divider horizontal></v-divider>
           <v-card>
@@ -143,9 +160,15 @@
       </v-layout>
 
       <v-layout row wrap>
-        <v-flex xs2 offset-xs10>
-          <v-btn color="blue darken-1" flat @click.native="cancel">Annuler</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="save">OK</v-btn>
+        <v-flex xs1 offset-xs10>
+          <v-layout justify-start>
+            <v-btn color="blue darken-1" flat @click.native="cancel">Annuler</v-btn>
+          </v-layout>
+        </v-flex>
+        <v-flex xs1>
+          <v-layout justify-start>
+            <v-btn color="blue darken-1" flat @click.native="ok">OK</v-btn>
+          </v-layout>
         </v-flex>
       </v-layout>
     </v-container>
@@ -153,8 +176,6 @@
 </template>
 
 <script>
-//import '../plugins/axios'
-
 import { EMPLOYEE_INIT } from '../config'
 import { ORGUNIT_INIT } from '../config'
 import { employe as EMPLOYE } from './employe'
@@ -175,7 +196,8 @@ export default {
   },
   data () {
     return {
-      dialog: false,
+      show: true,
+      show_list: false,
       alert: false,
       alert_msg: '',
       display_nonactive: true,
@@ -218,13 +240,7 @@ export default {
           sortable: true
         },
       ],
-      employee: {
-        nom: null,
-        prenom: null,
-        loginnt: null,
-        id: null,
-        idou: null
-      },
+      employee: undefined,
       employees: [],
       selected: [],
       orgunit: undefined,
@@ -248,13 +264,11 @@ export default {
       },
       deep: true
     },
-    dialog (val) {
-      val || this.close()
-    }
   },
   methods: {
-    dummy_func (msg) {
-      console.log(msg)
+    display_component () {
+      console.log('Appel de display_component')
+      this.show != this.show
     },
     initialize () {
       this.employee = Object.assign({}, EMPLOYEE_INIT)
@@ -264,14 +278,13 @@ export default {
     click () {
       // TODO: Afficher le widget et evt. faire quelques initialisations
     },
-    close () {
-      // TODO: Fermer le widget
-    },
     cancel () {
       // TODO: On n'affiche plus le widget
+      this.show = false
     },
-    save () {
+    ok () {
       // TODO: Emettre un événement avec en paramètre la liste des employés sélectionnés
+      this.$emit('selection_ready', this.selected)
     },
     fetchData () {
       if (this.isEqual(this.employee, EMPLOYEE_INIT)) {
@@ -281,6 +294,7 @@ export default {
       } else {
         EMPLOYE.getList (this.employee, this.display_nonactive, (data) => {
           this.employees = data
+          this.show_list = true
         })
       }
     },
