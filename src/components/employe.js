@@ -21,20 +21,18 @@ class Employe {
     if (employe.idou == null) {
       employe.idou = 0
     }
-    if ((employe.nom === null) || (employe.nom == '')) {
+    if ((employe.nom === null) || (employe.nom === undefined) || (employe.nom == '')) {
       employe.nom = '*'
     } else if (employe.nom.slice(-1) != '*') {
       employe.nom += '*'
     }
-    if ((employe.prenom === null) || (employe.prenom == '')) {
+    if ((employe.prenom === null) || (employe.prenom === undefined) || (employe.prenom == '')) {
       employe.prenom = '*'
     } else if (employe.prenom.slice(-1) != '*') {
       employe.prenom += '*'
     }
 
     let __fetch_url = `${EMP_URL_AJAX}/employe_get_liste.php`
-    console.log('### __fetch_url: ', __fetch_url)
-    console.log('### employe: ', employe)
     axios.post(__fetch_url, {params: employe}).then(response => {
       let __data = response.data.Employe.filter(employe => (employe.IsActive === '1') || display_nonactive)
 
