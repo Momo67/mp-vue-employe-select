@@ -1,33 +1,39 @@
-<template lang="html">
-  <v-app v-show="show" v-on:click="display_component">
+<template>
+  <div id="app">
+  <v-app id="inspire">
+    <v-layout row justify-center>
+      <v-dialog v-model="dialog">
+        <!-- <v-btn slot="activator" color="primary" dark>Open Dialog</v-btn> -->
+        <template slot="activator">
+          Cliquer ici!
+        </template>
 
-    <v-container fluid>
-      <v-layout row wrap>
-        <v-toolbar flat color="white">
-          <v-toolbar-title>Sélection d'employés</v-toolbar-title>
-        </v-toolbar>
-      </v-layout>
-
-      <v-layout row wrap>
-        <v-flex xs12>
-          <v-divider horizontal></v-divider>
-          <v-card>
-            <v-card-title></v-card-title>
-            <v-card-text>
-              <v-container grid-list-md>
+        <v-card>
+          <v-card-title>
+            <span class="headline">Sélection d'employé</span>
+          </v-card-title>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn icon @click="clear">
+              <v-tooltip bottom>
+                <span slot="activator">
+                  <v-icon>clear</v-icon>
+                </span>
+                <span>
+                  Cliquer pour réinitialiser
+                </span>
+              </v-tooltip>
+            </v-btn>
+          </v-card-actions>
+          <v-card-text>
+            <v-container grid-list-md>
+              <v-form ref="form">
                 <v-layout wrap>
-                  <v-flex xs4>
-                    <!-- <v-select
-                      v-model="employee.idou"
-                      :items="orgunits"
-                      item-text="Description"
-                      item-value="IdOrgUnit"
-                      label="Unité organisationnelle"
-                    ></v-select> -->
+                  <v-flex xs12>
                     <v-autocomplete
                       v-model="employee.idou"
                       :items="orgunits"
-                      color="white"
+                      color="primary"
                       hide-no-data
                       clearable
                       item-text="Description"
@@ -35,144 +41,146 @@
                       label="Unité organisationnelle"
                       placeholder="Entrer un caractère pour commencer la recherche"
                     ></v-autocomplete>
-
                   </v-flex>
-                  <v-flex xs4>
-                    <v-text-field v-model="employee.nom" label="Nom" clearable></v-text-field>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model="employee.nom" label="Nom" clearable :rules="[rules.nomprenom]"></v-text-field>
                   </v-flex>
-                  <v-flex xs4>
-                    <v-text-field v-model="employee.prenom" label="Prénom" clearable></v-text-field>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model="employee.prenom" label="Prénom" clearable :rules="[rules.nomprenom]"></v-text-field>
                   </v-flex>
-                  <v-flex xs4>
-                    <v-text-field v-model="employee.loginnt" label="Login NT" clearable></v-text-field>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model="employee.loginnt" label="Login NT" clearable :rules="[rules.loginnt]"></v-text-field>
                   </v-flex>
-                  <v-flex xs4>
-                    <v-text-field v-model="employee.id" label="Id" clearable></v-text-field>
-                  </v-flex>
-                  <v-flex xs12>
-                    <v-switch
-                      :label="'Afficher les employés désactivé: ' + (display_nonactive.toString() == 'true' ? 'oui' : 'non')"
-                      v-model="display_nonactive"
-                      :false-value="false"
-                      :true-value="true"
-                    ></v-switch>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model="employee.id" label="Id" clearable :rules="[rules.id]"></v-text-field>
                   </v-flex>
                 </v-layout>
-              </v-container>
-              <v-layout wrap>
-                <v-flex xs12>
-                  <v-alert
-                    v-model="alert"
-                    dismissible
-                    type="warning"
-                    icon="error"
-                  >
-                    {{alert_msg}}
-                  </v-alert>
-                </v-flex>
-              </v-layout>
-            </v-card-text>
-            <v-card-actions>
-              <v-flex xs1 offset-xs10 block>
-                <v-layout justify-start>
-                  <v-btn color="blue darken-1" flat @click.native="fetchData">Rechercher</v-btn>
-                </v-layout>
+              </v-form>
+              <v-flex xs12>
+                <v-switch
+                  :label="'Afficher les employés désactivé: ' + (display_nonactive.toString() == 'true' ? 'oui' : 'non')"
+                  v-model="display_nonactive"
+                  :false-value="false"
+                  :true-value="true"
+                ></v-switch>
               </v-flex>
-              <v-flex xs1>
-                <v-layout justify-end>
-                  <v-btn icon @click="show_list = !show_list">
-                    <v-icon>{{ show_list ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
-                  </v-btn>
-                </v-layout>
-              </v-flex>
-            </v-card-actions>
-          </v-card>
-        </v-flex>
-      </v-layout>
-
-      <v-layout row wrap v-show="show_list">
-        <v-flex xs12>
-          <v-divider horizontal></v-divider>
-          <v-card>
-            <v-card-title>
-              <v-spacer></v-spacer>
-              <v-layout wrap>
-                <v-flex xs4 offset-xs8>
-                  <v-text-field
-                    v-model="search"
-                    append-icon="search"
-                    label="Recherche..."
-                    single-line
-                    hide-details
-                  ></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-card-title>
-            <v-data-table
-              v-model="selected"
-              :headers="headers"
-              :items="employees"
-              item-key="idemploye"
-              :search="search"
-              :hide-actions="false"
-              :select-all="false"
-              class="elevation-1"
-              prev-icon="mdi-menu-left"
-              next-icon="mdi-menu-right"
-              sort-icon="mdi-menu-down">
-              <template slot="items" slot-scope="props">
-                <tr :class="(props.item.isactive == '1') ? '' : 'disabled'" @click="props.expanded = !props.expanded">
-                  <td>
-                    <v-checkbox v-show="(props.item.isactive == '1') || allowNonactiveSelectable"
-                    @click.native.stop
-                    v-model="props.selected"
-                    :disabled="!((props.item.isactive == '1') || allowNonactiveSelectable)"
-                    primary
-                    hide-details
-                    ></v-checkbox>
-                  </td>
-                  <td>{{props.item.nom}}</td>
-                  <td>{{props.item.prenom}}</td>
-                  <td>{{getOUPath(props.item.orgunits.OrgUnit)}}</td>
-                  <td>{{props.item.idemploye}}</td>
-                  <td>{{extractLoginNT(props.item.mainntlogin)}}</td>
-                  <!-- <td><v-icon class="mr-2" @click="editItem(props.item)">mdi-account-edit</v-icon></td> -->
-                </tr>
-              </template>
-              <template slot="expand" slot-scope="props">
-                <v-card flat>
-                  <v-card-text>
-                    <span>{{props.item.politesse}}</span><br>
-                    <span>{{props.item.prenom}}&nbsp;{{props.item.nom}}</span><br>
-                    <span>Téléphone prof.: {{props.item.telprof}}</span><br>
-                    <span>Email: {{props.item.email}}</span><br>
-                  </v-card-text>
-                </v-card>
-              </template>
-              <template slot="no-data">
-                <v-alert :value="true" type="info">
-                  Désolé, il n'y a aucun employé correspondant à votre recherche!
+              <v-flex xs12>
+                <v-alert
+                  v-model="alert"
+                  dismissible
+                  type="warning"
+                  icon="error"
+                >
+                  {{alert_msg}}
                 </v-alert>
-              </template>
-            </v-data-table>
-          </v-card>
-        </v-flex>
-      </v-layout>
+              </v-flex>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" flat @click.native="fetchData">Rechercher</v-btn>
+            <v-btn icon @click="show_list = !show_list">
+              <v-tooltip bottom>
+                <span slot="activator">
+                  <v-icon>{{ show_list ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+                </span>
+                <span>
+                  Afficher / masquer la liste des résultats
+                </span>
+              </v-tooltip>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
 
-      <v-layout row wrap>
-        <v-flex xs1 offset-xs10>
-          <v-layout justify-start>
+        <v-card v-show="show_list">
+          <v-card-title>
+            <v-spacer></v-spacer>
+            <v-layout wrap>
+              <v-flex xs8 offset-xs4>
+                <v-text-field
+                  v-model="search"
+                  append-icon="search"
+                  label="Recherche..."
+                  single-line
+                  hide-details
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-card-title>
+          <v-card-text>
+            <v-layout wrap>
+              <v-flex xs12>
+                <v-data-table
+                  v-model="selected"
+                  :headers="headers"
+                  :items="employees"
+                  item-key="idemploye"
+                  :search="search"
+                  :hide-actions="false"
+                  :select-all="false"
+                  class="elevation-1"
+                  prev-icon="mdi-menu-left"
+                  next-icon="mdi-menu-right"
+                  sort-icon="mdi-menu-down">
+
+                  <template slot="headerCell" slot-scope="props">
+                    <v-tooltip bottom>
+                      <span slot="activator">
+                        {{ props.header.text }}
+                      </span>
+                      <span>
+                        {{ props.header.text }}
+                      </span>
+                    </v-tooltip>
+                  </template>
+
+                  <template slot="items" slot-scope="props">
+                    <tr :class="(props.item.isactive == '1') ? '' : 'disabled'" @click="props.expanded = !props.expanded">
+                      <td>
+                        <v-checkbox v-show="(props.item.isactive == '1') || allowNonactiveSelectable"
+                        @click.native.stop
+                        v-model="props.selected"
+                        :disabled="!((props.item.isactive == '1') || allowNonactiveSelectable)"
+                        primary
+                        hide-details
+                        ></v-checkbox>
+                      </td>
+                      <td>{{props.item.nom}}</td>
+                      <td>{{props.item.prenom}}</td>
+                      <td>{{getOUPath(props.item.orgunits.OrgUnit)}}</td>
+                      <td>{{props.item.idemploye}}</td>
+                      <td>{{extractLoginNT(props.item.mainntlogin)}}</td>
+                    </tr>
+                  </template>
+                  <template slot="expand" slot-scope="props">
+                    <v-card flat>
+                      <v-card-text>
+                        <span>{{props.item.politesse}}</span><br>
+                        <span>{{props.item.prenom}}&nbsp;{{props.item.nom}}</span><br>
+                        <span>Téléphone prof.: {{props.item.telprof}}</span><br>
+                        <span>Email: {{props.item.email}}</span><br>
+                      </v-card-text>
+                    </v-card>
+                  </template>
+                  <template slot="no-data">
+                    <v-alert :value="true" type="info">
+                      Désolé, il n'y a aucun employé correspondant à votre recherche!
+                    </v-alert>
+                  </template>
+                </v-data-table>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
             <v-btn color="blue darken-1" flat @click.native="cancel">Annuler</v-btn>
-          </v-layout>
-        </v-flex>
-        <v-flex xs1>
-          <v-layout justify-start>
             <v-btn color="blue darken-1" flat @click.native="ok">OK</v-btn>
-          </v-layout>
-        </v-flex>
-      </v-layout>
-    </v-container>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-layout>
   </v-app>
+</div>
 </template>
 
 <script>
@@ -196,48 +204,70 @@ export default {
   },
   data () {
     return {
+      dialog: false,
       show: true,
       show_list: false,
       alert: false,
       alert_msg: '',
       display_nonactive: true,
       search: '',
+      rules: {
+        required: value => !!value || 'Required.',
+        nomprenom: value => {
+          const pattern = /^[a-zA-Z\s-]*\*?$/
+          return pattern.test(value) || 'Valeur invalide'
+        },
+        id: value => {
+          const pattern = /^undefined|[\d]+$/
+          return pattern.test(value) || 'Valeur invalide'
+        },
+        loginnt: value => {
+          const pattern = /^undefined|[[a-zA-Z]{1,5}\d+\*?]$/
+          return pattern.test(value) || 'Valeur invalide'
+        }
+      },
       headers: [
         {
           text: '',
           value: '',
           align: 'left',
-          sortable: false
+          sortable: false,
+          width: 10
         },
         {
           text: 'Nom',
           value: 'nom',
           align: 'left',
-          sortable: true
+          sortable: true,
+          width: 10
         },
         {
           text: 'Prénom',
           value: 'prenom',
           align: 'left',
-          sortable: true
+          sortable: true,
+          width: 10
         },
         {
           text: 'Unité organisationnelle',
           value: 'orgunits',
           align: 'left',
-          sortable: true
+          sortable: true,
+          width: 400
         },
         {
           text: 'Id',
           value: 'idemploye',
           align: 'left',
-          sortable: true
+          sortable: true,
+          width: 10
         },
         {
           text: 'Login NT',
           value: 'mainntlogin',
           align: 'left',
-          sortable: true
+          sortable: true,
+          width: 10
         },
       ],
       employee: undefined,
@@ -258,17 +288,22 @@ export default {
         this.fetchData()
       }
     },
-    'employee.idou': {
+    employee: {
       handler (val) {
-        console.log('### idou: ', val)
+        if (!this.isEqual(val, EMPLOYEE_INIT)) {
+          Object.keys(val).forEach(function (key) {
+            if ((val[key] === null) || (val[key] === '')) {
+              val[key] = undefined
+            }
+          })
+        }
       },
       deep: true
-    },
+    }
   },
   methods: {
-    display_component () {
-      console.log('Appel de display_component')
-      this.show != this.show
+    display () {
+      this.dialog = !this.dialog
     },
     initialize () {
       this.employee = Object.assign({}, EMPLOYEE_INIT)
@@ -280,11 +315,16 @@ export default {
     },
     cancel () {
       // TODO: On n'affiche plus le widget
-      this.show = false
+      this.dialog = false
+    },
+    clear () {
+      this.$refs.form.reset()
+      this.show_list = false
     },
     ok () {
-      // TODO: Emettre un événement avec en paramètre la liste des employés sélectionnés
-      this.$emit('selection_ready', this.selected)
+      this.$emit('selection_ready', JSON.stringify(this.selected))
+      this.selected = []
+      this.dialog = false
     },
     fetchData () {
       if (this.isEqual(this.employee, EMPLOYEE_INIT)) {
@@ -346,6 +386,7 @@ export default {
 }
 </script>
 
+<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="css" scoped>
 h3 {
   margin: 40px 0 0;
@@ -360,6 +401,9 @@ li {
 }
 a {
   color: #42b983;
+}
+td {
+  width: 50px;
 }
 .disabled {
   color: grey;
