@@ -1,4 +1,6 @@
 <template>
+  <div id="app">
+
   <v-app>
     <v-navigation-drawer
       persistent
@@ -45,7 +47,7 @@
       </v-btn>
     </v-toolbar>
     <v-content>
-      <HelloWorld/>
+      <EmployeSelect></EmployeSelect>
     </v-content>
     <v-navigation-drawer
       temporary
@@ -67,15 +69,17 @@
       <span>&copy; 2017</span>
     </v-footer>
   </v-app>
+</div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld'
+// import HelloWorld from './components/HelloWorld'
+import EmployeSelect from './components/EmployeSelect'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    EmployeSelect
   },
   data () {
     return {
