@@ -8,15 +8,18 @@
     "lint": "vue-cli-service lint",
     "build-lib": "vue-cli-service build --target lib --mode development --name EmployeSelect ./src/components/EmployeSelect.vue",
     "build-wc": "vue-cli-service build --target wc --mode development --name employe-select ./src/components/EmployeSelect.vue",
+    "build-hello": "vue-cli-service build --target lib --mode development --name HelloWorld ./src/components/HelloWorld.vue",
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0-rc.1",
     "axios": "^0.18.0",
     "vue": "^2.5.17",
+    "vue-i18n": "^8.0.0",
     "vuetify": "^1.2.6"
   },
   "devDependencies": {
+    "@kazupon/vue-i18n-loader": "^0.3.0",
     "@mdi/font": "^2.8.94",
     "@vue/cli-plugin-babel": "^3.0.5",
     "@vue/cli-plugin-eslint": "^3.0.5",
@@ -28,6 +31,7 @@
     "babel-jest": "^23.0.1",
     "material-design-icons-iconfont": "^3.0.3",
     "vue-cli-plugin-axios": "0.0.4",
+    "vue-cli-plugin-i18n": "^0.5.1",
     "vue-cli-plugin-vuetify": "^0.2.1",
     "vue-template-compiler": "^2.5.17"
   },
