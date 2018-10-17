@@ -1,17 +1,37 @@
 <template>
   <div id="app">
   <v-app id="inspire">
-    <v-layout row justify-center>
-      <v-dialog v-model="dialog">
-        <!-- <v-btn slot="activator" color="primary" dark>Open Dialog</v-btn> -->
+    <v-layout row>
+      <v-dialog v-model="dialog" max-width="800px" :fullscreen="$vuetify.breakpoint.xsOnly">
         <template slot="activator">
-          Cliquer ici!
+          <slot>
+            Cliquer ici!
+          </slot>
         </template>
 
         <v-card>
           <v-card-title>
-            <span class="headline">Sélection d'employé</span>
+            <span class="headline">{{multi ? 'Sélection d\'employés' : 'Sélection d\'un employé'}}</span>
           </v-card-title>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn icon @click="show_form = !show_form">
+              <v-tooltip bottom>
+                <span slot="activator">
+                  <v-icon>{{ show_form ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+                </span>
+                <span>
+                  Afficher / masquer les critères de sélection
+                </span>
+              </v-tooltip>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+
+        <v-card v-show="show_form">
+          <!-- <v-card-title>
+            <span class="headline">{{multi ? 'Sélection d\'employés' : 'Sélection d\'un employé'}}</span>
+          </v-card-title> -->
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn icon @click="clear">
@@ -26,7 +46,7 @@
             </v-btn>
           </v-card-actions>
           <v-card-text>
-            <v-container grid-list-md>
+            <v-container grid-list-md class="pt-0 pb-0">
               <v-form ref="form">
                 <v-layout wrap>
                   <v-flex xs12>
@@ -58,7 +78,7 @@
               </v-form>
               <v-flex xs12>
                 <v-switch
-                  :label="'Afficher les employés désactivé: ' + (display_nonactive.toString() == 'true' ? 'oui' : 'non')"
+                  :label="'Afficher les employés désactivé: ' + (display_nonactive ? 'oui' : 'non')"
                   v-model="display_nonactive"
                   :false-value="false"
                   :true-value="true"
@@ -138,11 +158,11 @@
                     <tr :class="(props.item.isactive == '1') ? '' : 'disabled'" @click="props.expanded = !props.expanded">
                       <td>
                         <v-checkbox v-show="(props.item.isactive == '1') || allowNonactiveSelectable"
-                        @click.native.stop
-                        v-model="props.selected"
-                        :disabled="!((props.item.isactive == '1') || allowNonactiveSelectable)"
-                        primary
-                        hide-details
+                          @click.native.stop
+                          v-model="props.selected"
+                          :disabled="!((props.item.isactive == '1') || allowNonactiveSelectable)"
+                          primary
+                          hide-details
                         ></v-checkbox>
                       </td>
                       <td>{{props.item.nom}}</td>
@@ -152,6 +172,7 @@
                       <td>{{extractLoginNT(props.item.mainntlogin)}}</td>
                     </tr>
                   </template>
+
                   <template slot="expand" slot-scope="props">
                     <v-card flat>
                       <v-card-text>
@@ -162,11 +183,13 @@
                       </v-card-text>
                     </v-card>
                   </template>
+
                   <template slot="no-data">
                     <v-alert :value="true" type="info">
                       Désolé, il n'y a aucun employé correspondant à votre recherche!
                     </v-alert>
                   </template>
+
                 </v-data-table>
               </v-flex>
             </v-layout>
@@ -184,6 +207,10 @@
 </template>
 
 <script>
+import '../plugins/vuetify'
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
+import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
+
 import { EMPLOYEE_INIT } from '../config'
 import { ORGUNIT_INIT } from '../config'
 import { employe as EMPLOYE } from './employe'
@@ -196,9 +223,19 @@ export default {
       default: true,
       require: false
     },
+    showNonActive: {
+      type: Boolean,
+      default: false,
+      require: false
+    },
     allowNonactiveSelectable: {
       type: Boolean,
       default: false,
+      require: false
+    },
+    json: {
+      type: Boolean,
+      default: true,
       require: false
     }
   },
@@ -206,6 +243,7 @@ export default {
     return {
       dialog: false,
       show: true,
+      show_form: true,
       show_list: false,
       alert: false,
       alert_msg: '',
@@ -281,11 +319,9 @@ export default {
     selected: {
       handler (val) {
         console.log('### employé sélectionné: ', val)
-      }
-    },
-    display_nonactive: {
-      handler () {
-        this.fetchData()
+        if ((!this.multi) && (val.length >1)) {
+          val.splice(0, val.length-1)
+        }
       }
     },
     employee: {
@@ -308,32 +344,33 @@ export default {
     initialize () {
       this.employee = Object.assign({}, EMPLOYEE_INIT)
       this.orgunit = Object.assign({}, ORGUNIT_INIT)
+      this.display_nonactive = this.showNonActive
       this.getOUList()
     },
-    click () {
-      // TODO: Afficher le widget et evt. faire quelques initialisations
-    },
     cancel () {
-      // TODO: On n'affiche plus le widget
       this.dialog = false
     },
     clear () {
       this.$refs.form.reset()
+      this.employee = Object.assign({}, EMPLOYEE_INIT)
+      this.employees = []
       this.show_list = false
     },
     ok () {
-      this.$emit('selection_ready', JSON.stringify(this.selected))
+      this.$emit('selection_ready', this.json ? JSON.stringify(this.selected) : this.selected)
       this.selected = []
       this.dialog = false
     },
     fetchData () {
+      this.alert = false
       if (this.isEqual(this.employee, EMPLOYEE_INIT)) {
         this.alert_msg = 'Vous devez entrer au moins un critère!'
         this.alert = true
-        return
+        this.show_form = true
       } else {
         EMPLOYE.getList (this.employee, this.display_nonactive, (data) => {
           this.employees = data
+          this.show_form = false
           this.show_list = true
         })
       }
@@ -374,7 +411,7 @@ export default {
       let __isequal = true
       Object.keys(obj1).forEach(function (key) {
         if (obj2[key] !== obj1[key]) {
-          return __isequal = false
+          __isequal = false
         }
       })
       return __isequal
@@ -388,6 +425,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="css" scoped>
+#inspire {
+  background-color: #FFFFFF;
+}
 h3 {
   margin: 40px 0 0;
 }
