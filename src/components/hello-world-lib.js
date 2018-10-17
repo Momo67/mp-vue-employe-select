@@ -34,7 +34,3 @@ if (typeof window !== 'undefined') {
 if (GlobalVue) {
   GlobalVue.use(plugin)
 }
-
-new Vue({
-  render: h => h(HelloWorld)
-}).$mount('#app')
