@@ -47,7 +47,7 @@
       </v-btn>
     </v-toolbar>
     <v-content>
-      <EmployeSelect></EmployeSelect>
+      <HelloWorld></HelloWorld>
     </v-content>
     <v-navigation-drawer
       temporary
@@ -76,13 +76,13 @@
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
 import './plugins/vuetify'
-// import HelloWorld from './components/HelloWorld'
-import EmployeSelect from './components/EmployeSelect'
+
+import HelloWorld from './components/HelloWorld'
 
 export default {
   name: 'App',
   components: {
-    EmployeSelect
+    HelloWorld
   },
   data () {
     return {

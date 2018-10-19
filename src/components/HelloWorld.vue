@@ -1,102 +1,209 @@
 <template>
   <div id="app">
-    <v-app class="app">
-    <v-dialog v-model="dialog">
-      <template slot="activator">
-        <slot>
-          Cliquer ici!
-        </slot>
-      </template>
-      <v-card>
-        <v-card-title>
-          <span class="headline">Sélection d'employé</span>
-        </v-card-title>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn icon @click="clear">
-            <v-tooltip bottom>
-              <span slot="activator">
-                <v-icon>clear</v-icon>
-              </span>
-              <span>
-                Cliquer pour réinitialiser
-              </span>
-            </v-tooltip>
-          </v-btn>
-        </v-card-actions>
-        <v-card-text>
-          <v-container grid-list-md>
-            <v-form ref="form">
-              <v-layout wrap>
-                <v-flex xs12>
-                  <v-autocomplete
-                    v-model="employee.idou"
-                    :items="orgunits"
-                    color="primary"
-                    hide-no-data
-                    clearable
-                    item-text="Description"
-                    item-value="IdOrgUnit"
-                    label="Unité organisationnelle"
-                    placeholder="Entrer un caractère pour commencer la recherche"
-                  ></v-autocomplete>
-                </v-flex>
-                <v-flex xs12 sm6 md6>
-                  <v-text-field v-model="employee.nom" label="Nom" clearable :rules="[rules.nomprenom]"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md6>
-                  <v-text-field v-model="employee.prenom" label="Prénom" clearable :rules="[rules.nomprenom]"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md6>
-                  <v-text-field v-model="employee.loginnt" label="Login NT" clearable :rules="[rules.loginnt]"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md6>
-                  <v-text-field v-model="employee.id" label="Id" clearable :rules="[rules.id]"></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-form>
-            <v-flex xs12>
-              <v-switch
-                :label="'Afficher les employés désactivé: ' + (display_nonactive.toString() == 'true' ? 'oui' : 'non')"
-                v-model="display_nonactive"
-                :false-value="false"
-                :true-value="true"
-              ></v-switch>
-            </v-flex>
-            <v-flex xs12>
-              <v-alert
-                v-model="alert"
-                dismissible
-                type="warning"
-                icon="error"
-              >
-                {{alert_msg}}
-              </v-alert>
-            </v-flex>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="fetchData">Rechercher</v-btn>
-          <v-btn icon @click="show_list = !show_list">
-            <v-tooltip bottom>
-              <span slot="activator">
-                <v-icon>{{ show_list ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
-              </span>
-              <span>
-                Afficher / masquer la liste des résultats
-              </span>
-            </v-tooltip>
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+  <v-app id="inspire">
+    <v-layout row>
+      <v-dialog v-model="dialog" max-width="800px" :fullscreen="$vuetify.breakpoint.xsOnly">
+        <template slot="activator">
+          <slot>
+            Cliquer ici!
+          </slot>
+        </template>
+
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{multi ? $t('SelectEmps') : $t('SelectEmp')}}</span>
+          </v-card-title>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn icon @click="show_form = !show_form">
+              <v-tooltip bottom>
+                <span slot="activator">
+                  <v-icon>{{ show_form ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+                </span>
+                <span>
+                  {{$t('DisplayCriterionBtn')}}
+                </span>
+              </v-tooltip>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+
+        <v-card v-show="show_form">
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn icon @click="clear">
+              <v-tooltip bottom>
+                <span slot="activator">
+                  <v-icon>clear</v-icon>
+                </span>
+                <span>
+                  {{$t('ResetBtn')}}
+                </span>
+              </v-tooltip>
+            </v-btn>
+          </v-card-actions>
+          <v-card-text>
+            <v-container grid-list-md class="pt-0 pb-0">
+              <v-form ref="form">
+                <v-layout wrap>
+                  <v-flex xs12>
+                    <v-autocomplete
+                      v-model="employee.idou"
+                      :items="orgunits"
+                      color="primary"
+                      hide-no-data
+                      clearable
+                      item-text="Description"
+                      item-value="IdOrgUnit"
+                      :label="$t('OrgUnit')"
+                      :placeholder="$t('SearchHint')"
+                    ></v-autocomplete>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model="employee.nom" :label="$t('LastName')" clearable :rules="[rules.nomprenom]"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model="employee.prenom" :label="$t('FirstName')" clearable :rules="[rules.nomprenom]"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model="employee.loginnt" label="Login NT" clearable :rules="[rules.loginnt]"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model="employee.id" label="Id" clearable :rules="[rules.id]"></v-text-field>
+                  </v-flex>
+                </v-layout>
+              </v-form>
+              <v-flex xs12>
+                <v-switch
+                  :label="$t('DisplayNonActive')+': ' + (display_nonactive ? $t('Yes') : $t('No'))"
+                  v-model="display_nonactive"
+                  :false-value="false"
+                  :true-value="true"
+                ></v-switch>
+              </v-flex>
+              <v-flex xs12>
+                <v-alert
+                  v-model="alert"
+                  dismissible
+                  type="warning"
+                  icon="error"
+                >
+                  {{alert_msg}}
+                </v-alert>
+              </v-flex>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" flat @click.native="fetchData">{{$t('SearchBtn')}}</v-btn>
+            <v-btn icon @click="show_list = !show_list">
+              <v-tooltip bottom>
+                <span slot="activator">
+                  <v-icon>{{ show_list ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+                </span>
+                <span>
+                  {{$t('DisplayListBtn')}}
+                </span>
+              </v-tooltip>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+
+        <v-card v-show="show_list">
+          <v-card-title>
+            <v-spacer></v-spacer>
+            <v-layout wrap>
+              <v-flex xs8 offset-xs4>
+                <v-text-field
+                  v-model="search"
+                  append-icon="search"
+                  :label="$t('Search')"
+                  single-line
+                  hide-details
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-card-title>
+          <v-card-text>
+            <v-layout wrap>
+              <v-flex xs12>
+                <v-data-table
+                  v-model="selected"
+                  :headers="headers"
+                  :items="employees"
+                  item-key="idemploye"
+                  :search="search"
+                  :hide-actions="false"
+                  :select-all="false"
+                  class="elevation-1"
+                  prev-icon="mdi-menu-left"
+                  next-icon="mdi-menu-right"
+                  sort-icon="mdi-menu-down">
+
+                  <template slot="headerCell" slot-scope="props">
+                    <v-tooltip bottom>
+                      <span slot="activator">
+                        {{ props.header.text }}
+                      </span>
+                      <span>
+                        {{ props.header.text }}
+                      </span>
+                    </v-tooltip>
+                  </template>
+
+                  <template slot="items" slot-scope="props">
+                    <tr :class="(props.item.isactive == '1') ? '' : 'disabled'" @click="props.expanded = !props.expanded">
+                      <td>
+                        <v-checkbox v-show="(props.item.isactive == '1') || allowNonactiveSelectable"
+                          @click.native.stop
+                          v-model="props.selected"
+                          :disabled="!((props.item.isactive == '1') || allowNonactiveSelectable)"
+                          primary
+                          hide-details
+                        ></v-checkbox>
+                      </td>
+                      <td>{{props.item.nom}}</td>
+                      <td>{{props.item.prenom}}</td>
+                      <td>{{getOUPath(props.item.orgunits.OrgUnit)}}</td>
+                      <td>{{props.item.idemploye}}</td>
+                      <td>{{extractLoginNT(props.item.mainntlogin)}}</td>
+                    </tr>
+                  </template>
+
+                  <template slot="expand" slot-scope="props">
+                    <v-card flat>
+                      <v-card-text>
+                        <span>{{props.item.politesse}}</span><br>
+                        <span>{{props.item.prenom}}&nbsp;{{props.item.nom}}</span><br>
+                        <span>Téléphone prof.: {{props.item.telprof}}</span><br>
+                        <span>Email: {{props.item.email}}</span><br>
+                      </v-card-text>
+                    </v-card>
+                  </template>
+
+                  <template slot="no-data">
+                    <v-alert :value="true" type="info">
+                      {{$t('NoResult')}}
+                    </v-alert>
+                  </template>
+
+                </v-data-table>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" flat @click.native="cancel">{{$t('Cancel')}}</v-btn>
+            <v-btn color="blue darken-1" flat @click.native="ok">OK</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-layout>
   </v-app>
-  </div>
+</div>
 </template>
 
 <script>
-import Vue from 'vue'
 import '../plugins/vuetify'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
@@ -113,9 +220,19 @@ export default {
       default: true,
       require: false
     },
+    showNonActive: {
+      type: Boolean,
+      default: false,
+      require: false
+    },
     allowNonactiveSelectable: {
       type: Boolean,
       default: false,
+      require: false
+    },
+    json: {
+      type: Boolean,
+      default: true,
       require: false
     }
   },
@@ -123,6 +240,7 @@ export default {
     return {
       dialog: false,
       show: true,
+      show_form: true,
       show_list: false,
       alert: false,
       alert_msg: '',
@@ -198,11 +316,9 @@ export default {
     selected: {
       handler (val) {
         console.log('### employé sélectionné: ', val)
-      }
-    },
-    display_nonactive: {
-      handler () {
-        this.fetchData()
+        if ((!this.multi) && (val.length >1)) {
+          val.splice(0, val.length-1)
+        }
       }
     },
     employee: {
@@ -225,33 +341,33 @@ export default {
     initialize () {
       this.employee = Object.assign({}, EMPLOYEE_INIT)
       this.orgunit = Object.assign({}, ORGUNIT_INIT)
+      this.display_nonactive = this.showNonActive
       this.getOUList()
     },
-    click () {
-      // TODO: Afficher le widget et evt. faire quelques initialisations
-    },
     cancel () {
-      // TODO: On n'affiche plus le widget
       this.dialog = false
     },
     clear () {
       this.$refs.form.reset()
+      this.employee = Object.assign({}, EMPLOYEE_INIT)
+      this.employees = []
       this.show_list = false
     },
     ok () {
-      // TODO: Retourner un tableau d'objets ou une chaîne JSON en fonction d'un prop
-      this.$emit('selection_ready', JSON.stringify(this.selected))
+      this.$emit('selection_ready', this.json ? JSON.stringify(this.selected) : this.selected)
       this.selected = []
       this.dialog = false
     },
     fetchData () {
+      this.alert = false
       if (this.isEqual(this.employee, EMPLOYEE_INIT)) {
-        this.alert_msg = 'Vous devez entrer au moins un critère!'
+        this.alert_msg = $t('AlertMsg')
         this.alert = true
-        return
+        this.show_form = true
       } else {
         EMPLOYE.getList (this.employee, this.display_nonactive, (data) => {
           this.employees = data
+          this.show_form = false
           this.show_list = true
         })
       }
@@ -292,7 +408,7 @@ export default {
       let __isequal = true
       Object.keys(obj1).forEach(function (key) {
         if (obj2[key] !== obj1[key]) {
-          return __isequal = false
+          __isequal = false
         }
       })
       return __isequal
@@ -306,8 +422,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="css" scoped>
-.app {
-  opacity: 1;
+#inspire {
   background-color: #FFFFFF;
 }
 h3 {
@@ -331,3 +446,46 @@ td {
   color: grey;
 }
 </style>
+
+<i18n>
+{
+  "en": {
+    "SelectEmp": "Selection of an employee",
+    "SelectEmps": "Selection of employees",
+    "NoResult": "Sorry, there are no employees matching your search!",
+    "AlertMsg": "You must enter at least one criterion!",
+    "SearchBtn": "Search",
+    "Search": "Search...",
+    "Cancel": "Cancel",
+    "DisplayListBtn": "Show / hide list of results",
+    "DisplayCriterionBtn": "Show / hide selection criterions",
+    "ResetBtn": "Click to reset",
+    "OrgUnit": "Organizational unit",
+    "SearchHint": "Enter a character to start the search",
+    "LastName": "Last name",
+    "FirstName": "First name",
+    "Yes": "oui",
+    "No": "non",
+    "DisplayNonActive": "Show disabled employees"
+  },
+  "fr": {
+    "SelectEmp": "Sélection d'un employé",
+    "SelectEmps": "Sélection d'employés",
+    "NoResult": "Désolé, il n'y a aucun employé correspondant à votre recherche!",
+    "AlertMsg": "Vous devez entrer au moins un critère!",
+    "SearchBtn": "Rechercher",
+    "Search": "Recherche...",
+    "Cancel": "Annuler",
+    "DisplayListBtn": "Afficher / masquer la liste des résultats",
+    "DisplayCriterionBtn": "Afficher / masquer les critères de sélection",
+    "ResetBtn": "Cliquer pour réinitialiser",
+    "OrgUnit": "Unité organisationnelle",
+    "SearchHint": "Entrer un caractère pour commencer la recherche",
+    "LastName": "Nom",
+    "FirstName": "Prénom",
+    "Yes": "oui",
+    "No": "non",
+    "DisplayNonActive": "Afficher les employés désactivé"
+  }
+}
+</i18n>
