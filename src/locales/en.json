@@ -1,6 +1,24 @@
 {
-  "message": "hello i18n !!",
-  "$vuetify": {
+  "en": {
+    "userInterface": {
+      "selectEmp": "Selection of an employee",
+      "noResult": "Sorry, there are no employees matching your search!",
+      "alertMsg": "You must enter at least one criterion!",
+      "searchBtn": "Search",
+      "search": "Search...",
+      "cancel": "Cancel",
+      "displayListBtn": "Show / hide list of results",
+      "displayCriterionBtn": "Show / hide selection criterions",
+      "resetBtn": "Click to reset",
+      "orgUnit": "Organizational unit",
+      "searchHint": "Enter a character to start the search",
+      "lastName": "Last Name",
+      "firstName": "First name",
+      "yes": "yes",
+      "no": "no",
+      "displayNonActive": "Show disabled employees",
+      "noDataText": "No data available"
+    },
     "dataIterator": {
       "rowsPerPageText": "Items per page:",
       "rowsPerPageAll": "All",
@@ -11,7 +29,6 @@
     },
     "dataTable": {
       "rowsPerPageText": "Rows per page:"
-    },
-    "noDataText": "No data available"
+    }
   }
 }

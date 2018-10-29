@@ -11,7 +11,7 @@
 
         <v-card>
           <v-card-title>
-            <span class="headline">{{multi ? $t('message.hello') : $t('SelectEmp')}}</span>
+            <span class="headline">{{multi ? $tc('userInterface.selectEmp' , 2) : $tc('userInterface.selectEmp', 1)}}</span>
           </v-card-title>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -21,7 +21,7 @@
                   <v-icon>{{ show_form ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
                 </span>
                 <span>
-                  {{$t('DisplayCriterionBtn')}}
+                  {{$t('userInterface.displayCriterionBtn')}}
                 </span>
               </v-tooltip>
             </v-btn>
@@ -37,7 +37,7 @@
                   <v-icon>clear</v-icon>
                 </span>
                 <span>
-                  {{$t('ResetBtn')}}
+                  {{$t('userInterface.resetBtn')}}
                 </span>
               </v-tooltip>
             </v-btn>
@@ -55,15 +55,15 @@
                       clearable
                       item-text="Description"
                       item-value="IdOrgUnit"
-                      :label="$t('OrgUnit')"
-                      :placeholder="$t('SearchHint')"
+                      :label="$t('userInterface.orgUnit')"
+                      :placeholder="$t('userInterface.searchHint')"
                     ></v-autocomplete>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model="employee.nom" :label="$t('LastName')" clearable :rules="[rules.nomprenom]"></v-text-field>
+                    <v-text-field v-model="employee.nom" :label="$t('userInterface.lastName')" clearable :rules="[rules.nomprenom]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model="employee.prenom" :label="$t('FirstName')" clearable :rules="[rules.nomprenom]"></v-text-field>
+                    <v-text-field v-model="employee.prenom" :label="$t('userInterface.firstName')" clearable :rules="[rules.nomprenom]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
                     <v-text-field v-model="employee.loginnt" label="Login NT" clearable :rules="[rules.loginnt]"></v-text-field>
@@ -75,7 +75,7 @@
               </v-form>
               <v-flex xs12>
                 <v-switch
-                  :label="$t('DisplayNonActive')+': ' + (display_nonactive ? $t('Yes') : $t('No'))"
+                  :label="$t('userInterface.displayNonActive')+': ' + (display_nonactive ? $t('userInterface.yes') : $t('userInterface.no'))"
                   v-model="display_nonactive"
                   :false-value="false"
                   :true-value="true"
@@ -88,21 +88,21 @@
                   type="warning"
                   icon="error"
                 >
-                  {{alert_msg}}
+                  {{$t('userInterface.alertMsg')}}
                 </v-alert>
               </v-flex>
             </v-container>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click.native="fetchData">{{$t('SearchBtn')}}</v-btn>
+            <v-btn color="blue darken-1" flat @click.native="fetchData">{{$t('userInterface.searchBtn')}}</v-btn>
             <v-btn icon @click="show_list = !show_list">
               <v-tooltip bottom>
                 <span slot="activator">
                   <v-icon>{{ show_list ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
                 </span>
                 <span>
-                  {{$t('DisplayListBtn')}}
+                  {{$t('userInterface.displayListBtn')}}
                 </span>
               </v-tooltip>
             </v-btn>
@@ -117,7 +117,7 @@
                 <v-text-field
                   v-model="search"
                   append-icon="search"
-                  :label="$t('Search')"
+                  :label="$t('userInterface.search')"
                   single-line
                   hide-details
                 ></v-text-field>
@@ -139,7 +139,7 @@
                   prev-icon="mdi-menu-left"
                   next-icon="mdi-menu-right"
                   sort-icon="mdi-menu-down"
-                  :no-data-text="$t('noDataText')"
+                  :no-data-text="$t('userInterface.noDataText')"
                   :no-results-text="$t('dataIterator.noResultsText')"
                   :rows-per-page-items="[5,10,25,{'text':$t('dataIterator.rowsPerPageAll'),'value':-1}]"
                   :rows-per-page-text="$t('dataTable.rowsPerPageText')">
@@ -168,7 +168,7 @@
                       </td>
                       <td>{{props.item.nom}}</td>
                       <td>{{props.item.prenom}}</td>
-                      <td>{{getOUPath(props.item.orgunits.OrgUnit)}}</td>
+                      <td>{{getOUFinal(props.item.orgunits.OrgUnit)}}</td>
                       <td>{{props.item.idemploye}}</td>
                       <td>{{extractLoginNT(props.item.mainntlogin)}}</td>
                     </tr>
@@ -181,13 +181,14 @@
                         <span>{{props.item.prenom}}&nbsp;{{props.item.nom}}</span><br>
                         <span>Téléphone prof.: {{props.item.telprof}}</span><br>
                         <span>Email: {{props.item.email}}</span><br>
+                        <span>Unité organisationnelle: {{getOUPath(props.item.orgunits.OrgUnit)}}</span>
                       </v-card-text>
                     </v-card>
                   </template>
 
                   <template slot="no-data">
                     <v-alert :value="true" type="info">
-                      {{$t('NoResult')}}
+                      {{$t('userInterface.noResult')}}
                     </v-alert>
                   </template>
 
@@ -197,7 +198,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click.native="cancel">{{$t('Cancel')}}</v-btn>
+            <v-btn color="blue darken-1" flat @click.native="cancel">{{$t('userInterface.cancel')}}</v-btn>
             <v-btn color="blue darken-1" flat @click.native="ok">OK</v-btn>
           </v-card-actions>
         </v-card>
@@ -364,7 +365,6 @@ export default {
     fetchData () {
       this.alert = false
       if (this.isEqual(this.employee, EMPLOYEE_INIT)) {
-        this.alert_msg = $t('AlertMsg')
         this.alert = true
         this.show_form = true
       } else {
@@ -395,6 +395,27 @@ export default {
             __oupath += orgunit.OUName + ((index+1 != array.length) ? ' / ' : '')
           })
           return __oupath
+        } else {
+          return orgunits.OUName
+        }
+      } else {
+        return ''
+      }
+    },
+    getOUFinal (orgunits)
+    {
+      if (orgunits !== undefined) {
+        if (Array.isArray(orgunits)) {
+          let __myorgunits = orgunits.slice()
+          __myorgunits.sort(function (a, b) {
+            return parseInt(b.LevelOU) - parseInt(a.LevelOU)
+          })
+          let __oufinal = ''
+          __myorgunits.forEach(function (orgunit, index, array) {
+            if (index === array.length-1)
+              __oufinal = orgunit.OUName
+          })
+          return __oufinal
         } else {
           return orgunits.OUName
         }
@@ -450,81 +471,5 @@ td {
 }
 </style>
 
-<i18n>
-{
-  "en": {
-    "SelectEmp": "Selection of an employee",
-    "SelectEmps": "Selection of employees",
-    "NoResult": "Sorry, there are no employees matching your search!",
-    "AlertMsg": "You must enter at least one criterion!",
-    "SearchBtn": "Search",
-    "Search": "Search...",
-    "Cancel": "Cancel",
-    "DisplayListBtn": "Show / hide list of results",
-    "DisplayCriterionBtn": "Show / hide selection criterions",
-    "ResetBtn": "Click to reset",
-    "OrgUnit": "Organizational unit",
-    "SearchHint": "Enter a character to start the search",
-    "LastName": "Last Name",
-    "FirstName": "First name",
-    "Yes": "yes",
-    "No": "no",
-    "DisplayNonActive": "Show disabled employees",
-    "dataIterator": {
-      "rowsPerPageText": "Items per page:",
-      "rowsPerPageAll": "All",
-      "pageText": "{0}-{1} of {2}",
-      "noResultsText": "No matching records found",
-      "nextPage": "Next page",
-      "prevPage": "Previous page"
-    },
-    "dataTable": {
-      "rowsPerPageText": "Rows per page:"
-    },
-    "noDataText": "No data available"
-  },
-  "fr": {
-    "message": {
-      "hello": "Salut de l'intérieur du composant!"
-    },
-    "SelectEmp": "Sélection d'un employé",
-    "SelectEmps": "Sélection d'employés",
-    "NoResult": "Désolé, il n'y a aucun employé correspondant à votre recherche!",
-    "AlertMsg": "Vous devez entrer au moins un critère!",
-    "SearchBtn": "Rechercher",
-    "Search": "Recherche...",
-    "Cancel": "Annuler",
-    "DisplayListBtn": "Afficher / masquer la liste des résultats",
-    "DisplayCriterionBtn": "Afficher / masquer les critères de sélection",
-    "ResetBtn": "Cliquer pour réinitialiser",
-    "OrgUnit": "Unité organisationnelle",
-    "SearchHint": "Entrer un caractère pour commencer la recherche",
-    "LastName": "Nom",
-    "FirstName": "Prénom",
-    "Yes": "oui",
-    "No": "non",
-    "DisplayNonActive": "Afficher les employés désactivé",
-    "dataIterator": {
-      "rowsPerPageText": "Élements par page:",
-      "rowsPerPageAll": "Tous",
-      "pageText": "{0}-{1} de {2}",
-      "noResultsText": "Aucun enregistrement correspondant trouvé",
-      "nextPage": "Page suivante",
-      "prevPage": "Page précédente"
-    },
-    "dataTable": {
-      "rowsPerPageText": "Lignes par page:"
-    },
-    "noDataText": "Aucune donnée disponible"
-  },
-  "mylocale": {
-    "message": {
-      "hello": ""
-    },
-    "OrgUnit": "",
-    "dataTable": {
-      "rowsPerPageText": ""
-    }
-  }
-}
-</i18n>
+<i18n src="../locales/fr.json"></i18n>
+<i18n src="../locales/en.json"></i18n>

@@ -1,6 +1,7 @@
 import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
 import Vue from 'vue'
 import '../plugins/vuetify'
+import i18n from '../i18n'
 
 import EmployeSelect from './EmployeSelect.vue'
 
@@ -35,3 +36,8 @@ if (typeof window !== 'undefined') {
 if (GlobalVue) {
   GlobalVue.use(plugin)
 }
+
+new Vue({
+  i18n,
+  render: h => h(EmployeSelect)
+}).$mount('#app')

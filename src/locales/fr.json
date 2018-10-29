@@ -1,6 +1,24 @@
 {
-  "message": "Salut i18n !!",
-  "$vuetify": {
+  "fr": {
+    "userInterface": {
+      "selectEmp": "Sélection d'un employé | Sélection d'employés",
+      "noResult": "Désolé, il n'y a aucun employé correspondant à votre recherche!",
+      "alertMsg": "Vous devez entrer au moins un critère!",
+      "searchBtn": "Rechercher",
+      "search": "Recherche...",
+      "cancel": "Annuler",
+      "displayListBtn": "Afficher / masquer la liste des résultats",
+      "displayCriterionBtn": "Afficher / masquer les critères de sélection",
+      "resetBtn": "Cliquer pour réinitialiser",
+      "orgUnit": "Unité organisationnelle",
+      "searchHint": "Entrer un caractère pour commencer la recherche",
+      "lastName": "Nom",
+      "firstName": "Prénom",
+      "yes": "oui",
+      "no": "non",
+      "displayNonActive": "Afficher les employés désactivés",
+      "noDataText": "Aucune donnée disponible"
+    },
     "dataIterator": {
       "rowsPerPageText": "Élements par page:",
       "rowsPerPageAll": "Tous",
@@ -11,7 +29,6 @@
     },
     "dataTable": {
       "rowsPerPageText": "Lignes par page:"
-    },
-    "noDataText": "Aucune donnée disponible"
+    }
   }
 }
