@@ -156,7 +156,7 @@
                   </template>
 
                   <template slot="items" slot-scope="props">
-                    <tr :class="(props.item.isactive == '1') ? '' : 'disabled'" @click="props.expanded = !props.expanded">
+                    <tr :class="(props.item.isactive == '1') ? '' : 'disabled'" @click="if (showEmpDetails) props.expanded = !props.expanded">
                       <td>
                         <v-checkbox v-show="(props.item.isactive == '1') || allowNonactiveSelectable"
                           @click.native.stop
@@ -177,11 +177,15 @@
                   <template slot="expand" slot-scope="props">
                     <v-card flat>
                       <v-card-text>
-                        <span>{{props.item.politesse}}</span><br>
-                        <span>{{props.item.prenom}}&nbsp;{{props.item.nom}}</span><br>
-                        <span>Téléphone prof.: {{props.item.telprof}}</span><br>
-                        <span>Email: {{props.item.email}}</span><br>
-                        <span>Unité organisationnelle: {{getOUPath(props.item.orgunits.OrgUnit)}}</span>
+                        <slot name="employee_info" :props="props">
+                          <div class="employee_info">
+                            <span>{{props.item.politesse}}</span><br>
+                            <span>{{props.item.prenom}}&nbsp;{{props.item.nom}}</span><br>
+                            <span>Téléphone prof.: {{props.item.telprof}}</span><br>
+                            <span>Email: {{props.item.email}}</span><br>
+                            <span>Unité organisationnelle: {{getOUPath(props.item.orgunits.OrgUnit)}}</span>
+                          </div>
+                        </slot>
                       </v-card-text>
                     </v-card>
                   </template>
@@ -227,6 +231,11 @@ export default {
     showNonActive: {
       type: Boolean,
       default: false,
+      require: false
+    },
+    showEmpDetails: {
+      type: Boolean,
+      default: true,
       require: false
     },
     allowNonactiveSelectable: {
