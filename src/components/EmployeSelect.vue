@@ -4,9 +4,7 @@
     <v-layout row>
       <v-dialog v-model="dialog" max-width="800px" :fullscreen="$vuetify.breakpoint.xsOnly">
         <template slot="activator">
-          <slot>
-            Cliquer ici!
-          </slot>
+          <slot></slot>
         </template>
 
         <v-card>
@@ -57,19 +55,20 @@
                       item-value="IdOrgUnit"
                       :label="$t('userInterface.orgUnit')"
                       :placeholder="$t('userInterface.searchHint')"
+                      browser-autocomplete="something-new"
                     ></v-autocomplete>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model="employee.nom" :label="$t('userInterface.lastName')" clearable :rules="[rules.nomprenom]"></v-text-field>
+                    <v-text-field v-model="employee.nom" :label="$t('userInterface.lastName')" clearable :rules="[rules.nomprenom]" browser-autocomplete="something-new"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model="employee.prenom" :label="$t('userInterface.firstName')" clearable :rules="[rules.nomprenom]"></v-text-field>
+                    <v-text-field v-model="employee.prenom" :label="$t('userInterface.firstName')" clearable :rules="[rules.nomprenom]" browser-autocomplete="something-new"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model="employee.loginnt" label="Login NT" clearable :rules="[rules.loginnt]"></v-text-field>
+                    <v-text-field v-model="employee.loginnt" label="Login NT" clearable :rules="[rules.loginnt]" browser-autocomplete="something-new"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model="employee.id" label="Id" clearable :rules="[rules.id]"></v-text-field>
+                    <v-text-field v-model="employee.id" label="Id" clearable :rules="[rules.id]" browser-autocomplete="something-new"></v-text-field>
                   </v-flex>
                 </v-layout>
               </v-form>
@@ -367,7 +366,7 @@ export default {
       this.show_list = false
     },
     ok () {
-      this.$emit('selection_ready', this.json ? JSON.stringify(this.selected) : this.selected)
+      this.$emit('selection_ready', this.json ? JSON.stringify(this.selected) : this.selected, this.selected.length)
       this.selected = []
       this.dialog = false
     },
