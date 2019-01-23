@@ -215,10 +215,14 @@
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
 
-import { EMPLOYEE_INIT } from '../config'
-import { ORGUNIT_INIT } from '../config'
+import { DEV, ORGUNIT_INIT, EMPLOYEE_INIT } from '../config'
 import { employe as EMPLOYE } from './employe'
 import { orgunit as ORGUNIT } from './orgunit'
+
+import Log from 'cgil-log'
+
+const MODULE_NAME = 'EmployeSelect.vue'
+const log = (DEV) ? new Log(MODULE_NAME, 4) : new Log(MODULE_NAME, 2)
 
 export default {
   props: {
@@ -327,7 +331,7 @@ export default {
   watch: {
     selected: {
       handler (val) {
-        console.log('### employé sélectionné: ', val)
+        log.l(`## in watch selected val: `, val)
         if ((!this.multi) && (val.length >1)) {
           val.splice(0, val.length-1)
         }

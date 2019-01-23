@@ -1,5 +1,9 @@
 import axios from 'axios'
-import { EMP_URL_AJAX } from '../config'
+import { DEV, EMP_URL_AJAX } from '../config'
+import Log from 'cgil-log'
+
+const MODULE_NAME = 'employe.js'
+const log = (DEV) ? new Log(MODULE_NAME, 4) : new Log(MODULE_NAME, 2)
 
 let instance = null
 /*  Singleton to retrieve employe
@@ -46,17 +50,16 @@ class Employe {
       })
       callback(__data)
 
-      console.log('### EMPLOYE response: ', response)
-      console.log('### EMPLOYE employees: ', __data)
+      log.l('## in Employe::getList employees: ', __data)
     }).catch(error => {
       if (error.response) {
-        console.error('Error data: ', error.response.data, ' status: ', error.response.status, ' headers: ', error.response.headers)
+        log.e(`## in Employe::getList Error data: ${error.response.data}, status: ${error.response.status}, headers: ${error.response.headers}`)
       } else if (error.request) {
-        console.error('Error request: ', error.request)
+        log.e(`## in Employe::getList Error request: ${error.request}`)
       } else {
-        console.error('Error', error.message)
+        log.e(`## in Employe::getList Error: ${error.message}`)
       }
-      console.error(error.config)
+      log.e(`## in Employe::getList Error: ${error.config}`)
     })
   }
 }
