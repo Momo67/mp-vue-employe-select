@@ -45,11 +45,11 @@ class OrgUnit {
       if (error.response) {
         log.e(`## in OrgUnit::getList Error data: ${error.response.data}, status: ${error.response.status}, headers: ${error.response.headers}`)
       } else if (error.request) {
-        log.e(`## in OrgUnit::getList Error request: ${error.request}`)
+        log.e(`## in OrgUnit::getList Error request: `, error.request)
       } else {
-        log.e(`## in OrgUnit::getList Error: ${error.message}`)
+        log.e(`## in OrgUnit::getList Error: `, error.message)
       }
-      log.e(`## in OrgUnit::getList Error: ${error.config}`)
+      log.e(`## in OrgUnit::getList Error: `, error.config)
     })
   }
 }

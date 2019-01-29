@@ -55,11 +55,11 @@ class Employe {
       if (error.response) {
         log.e(`## in Employe::getList Error data: ${error.response.data}, status: ${error.response.status}, headers: ${error.response.headers}`)
       } else if (error.request) {
-        log.e(`## in Employe::getList Error request: ${error.request}`)
+        log.e(`## in Employe::getList Error request: `, error.request)
       } else {
-        log.e(`## in Employe::getList Error: ${error.message}`)
+        log.e(`## in Employe::getList Error: `, error.message)
       }
-      log.e(`## in Employe::getList Error: ${error.config}`)
+      log.e(`## in Employe::getList Error: `, error.config)
     })
   }
 }
