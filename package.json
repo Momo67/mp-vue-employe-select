@@ -1,7 +1,16 @@
 {
   "name": "mp-vue-employe-select",
   "version": "0.1.0",
-  "private": true,
+  "license": "MIT",
+  "description": "A Vue.js component to select employees in Goeland",
+  "main": "dist/EmployeSelect.umd.min.js",
+  "author": "Maurice Pittet <maurice.pittet@lausanne.ch>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Momo67/mp-vue-employe-select.git"
+  },
+  "homepage": "https://github.com/Momo67/mp-vue-employe-select#readme",
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
