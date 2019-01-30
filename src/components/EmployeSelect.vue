@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-  <v-app id="inspire">
+  <v-app id="mp-vue-employe-select">
     <v-layout row>
       <v-dialog v-model="dialog" max-width="800px" :fullscreen="$vuetify.breakpoint.xsOnly">
         <template slot="activator">
@@ -208,10 +208,11 @@
       </v-dialog>
     </v-layout>
   </v-app>
-</div>
+  </div>
 </template>
 
 <script>
+import 'babel-polyfill'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
 
@@ -459,7 +460,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="css" scoped>
 #inspire {
-  background-color: #FFFFFF;
+  background-color: transparent;
 }
 h3 {
   margin: 40px 0 0;
