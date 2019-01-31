@@ -1,20 +1,107 @@
-<!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title>mp-vue-employe-select</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons">
-    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
-  </head>
-  <body>
-    <noscript>
-      <strong>We're sorry but mp-vue-employe-select doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-  </body>
-</html>
+<meta charset="utf-8">
+<title>EmployeSelect demo</title>
+<!--
+<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+-->
+<link rel='stylesheet prefetch' href='https://unpkg.com/vuetify/dist/vuetify.min.css'>
+<link rel="stylesheet" href="./EmployeSelect.css" />
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/vuetify@1.2.10"></script>
+<script src="https://unpkg.com/vue-i18n@latest/dist/vue-i18n.js"></script>
+<script src="./EmployeSelect.umd.js?V=20"></script>
+
+<div id="app">
+  Avant le composant
+  <demo class="demo" @selection_ready="show_selected" :show-emp-details="true" :json="true">
+    Cliquer ici
+    <!--
+    <template slot="employee_info" slot-scope="slotProps">
+      <div class="employee_info">
+        <span>Nom: {{slotProps.props.item.prenom}}&nbsp;{{slotProps.props.item.nom}}</span>
+      </div>
+    </template>
+    -->
+  </demo> Après le composant
+</div>
+
+<script>
+
+const messages = {
+  ch: {
+    userInterface: {
+      selectEmp: 'Sélection suisse',
+      orgUnit: 'Service',
+    },
+    dataIterator: {
+      rowsPerPageAll: 'Toute',
+    }
+  },
+}
+
+const i18n = new VueI18n({
+  locale: 'fr', // set locale
+  fallbackLocale: 'fr',
+})
+
+const app = new Vue({
+  i18n,
+  components: {
+    demo: EmployeSelect
+  },
+  methods: {
+    show_selected(employees, length)
+    {
+      function getValues(obj, key) {
+          var objects = [];
+          for (var i in obj) {
+              if (!obj.hasOwnProperty(i)) continue;
+              if (typeof obj[i] == 'object') {
+                  objects = objects.concat(getValues(obj[i], key));
+              } else if (i == key) {
+                  objects.push(obj[i]);
+              }
+          }
+          return objects;
+      }
+
+      alert("length:" + length)
+      alert("Employé(s) sélectionné(s): " + JSON.parse(employees)[length-1].idemploye)
+      // JSON.parse(employees, (key, value) => {
+      //   if (key == "idemploye") {
+      //     idemploye = value
+      //   }
+      // })
+      alert("### idemploye: " + getValues(JSON.parse(employees), 'idemploye'))
+      // JSON.parse(employees, function (key, value) {
+      //   if (key == "idemploye") {
+      //     alert('value[key]: ' + value);
+      //   } else {
+      //     return value;
+      //   }
+      // });
+    }
+  }
+}).$mount('#app')
+
+let ch = app.$children[0].$i18n.getLocaleMessage('ch')
+ch = Object.assign(messages.ch, ch)
+app.$children[0].$i18n.setLocaleMessage('ch', ch)
+i18n.locale = 'fr'
+
+</script>
+
+<style lang="css">
+  .demo {
+    width: 100px;
+    height: 20px;
+  }
+  .employee_info span {
+    /* text-decoration: line-through; */
+  }
+  #mp-vue-employe-select {
+    background-color: #FF0000;
+    width: ;
+    display: inline-block;
+    height: 20px;
+  }
+</style>
